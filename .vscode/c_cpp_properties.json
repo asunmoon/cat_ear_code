@@ -1,0 +1,54 @@
+{
+    "configurations": [
+        {
+            "name": "ESP-IDF",
+            "compilerPath": "${config:idf.toolsPath}\\tools\\riscv32-esp-elf\\esp-2021r2-patch5-8.4.0\\riscv32-esp-elf\\bin\\riscv32-esp-elf-gcc.exe",
+            "includePath": [
+                "${config:idf.espIdfPath}/components/**",
+                "${config:idf.espIdfPathWin}/components/**",
+                "${config:idf.espAdfPath}/components/**",
+                "${config:idf.espAdfPathWin}/components/**",
+                "${workspaceFolder}/**",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/bt/host/bluedroid/api/include/api",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/esp_common/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/freertos/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/tinyusb/tinyusb/examples/device/hid_composite_freertos/src",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/nvs_flash/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/fatfs/test_fatfs_host/sdkconfig",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/bt/include/esp32c3/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/esp_system/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/tinyusb/tinyusb/hw",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/esp_hw_support/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/spi_flash/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/spi_flash/sim/stubs/log/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/spi_flash/sim/stubs/soc/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/mqtt/host_test/mocks/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/tinyusb/tinyusb/src",
+                "${workspaceFolder}/components/ble/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/driver/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/soc/esp32c3/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/hal/include",
+                "${workspaceFolder}/components/servo_smooth/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/soc/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/esp_rom/include",
+                "${workspaceFolder}/components/mpu6050/include",
+                "${workspaceFolder}/components/mpu6050with_carman/include",
+                "C:/Espressif/frameworks/esp-idf-v4.4.5/components/esp_ringbuf/include",
+                "${workspaceFolder}/components/ear/include"
+            ],
+            "browse": {
+                "path": [
+                    "${config:idf.espIdfPath}/components",
+                    "${config:idf.espIdfPathWin}/components",
+                    "${config:idf.espAdfPath}/components/**",
+                    "${config:idf.espAdfPathWin}/components/**",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": false
+            },
+            "cStandard": "c11",
+            "cppStandard": "c++11"
+        }
+    ],
+    "version": 4
+}
