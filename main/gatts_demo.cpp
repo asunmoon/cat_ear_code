@@ -1,19 +1,3 @@
-// /*
-//    This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-//    Unless required by applicable law or agreed to in writing, this
-//    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-//    CONDITIONS OF ANY KIND, either express or implied.
-// */
-
-// /****************************************************************************
-// *
-// * This demo showcases BLE GATT server. It can send adv data, be connected by client.
-// * Run the gatt_client demo, the client demo will automatically connect to the gatt_server demo.
-// * Client demo will enable gatt_server's notify after connection. The two devices will then exchange
-// * data.
-// *
-// ****************************************************************************/
 #include "driver/i2c.h"
 #include <string.h>
 #include <stdio.h>
@@ -50,84 +34,58 @@ extern "C"
 #include "inv_mpu.h"
 #include "servo_smooth.h"
 }
-// #include "ble.h"
+
 
 #define GATTS_TAG "GATTS_DEMO"
 #define I2C_NUM I2C_NUM_0
-///
+
 struct mpu6050_Data mpu6050_data;
 TaskHandle_t myHandle = NULL;
-// void app_main(void)
-// {
-//     ledc_channel_config_t servo_channel;
-//     // printf("hhhh\n");
-//     // vTaskDelay(1000/portTICK_RATE_MS);
-//     // while(1)
-//     // {
-//     //     servo_control_task();
-//     // }
-//     esp_err_t ret;
 
-//     // Initialize NVS.
-//     ret = nvs_flash_init();
-//     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-//         ESP_ERROR_CHECK(nvs_flash_erase());
-//         ret = nvs_flash_init();
-//     }
-//     ESP_ERROR_CHECK( ret );
+ledc_timer_config_t servo_timer = {
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .duty_resolution = LEDC_TIMER_13_BIT, // resolution of PWM duty
+        .timer_num = LEDC_TIMER_1,
+        .freq_hz = SERVO_FREQUENCY, // frequency of PWM signal
+        .clk_cfg = LEDC_AUTO_CLK,   // Auto select the source clock
+    };
+ledc_channel_config_t servo_channe0 = {
+        .gpio_num = 8,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = LEDC_CHANNEL_1,
+        .timer_sel = LEDC_TIMER_1,
+        .duty = 0,
+        .hpoint = 0,
+        {0}};
+ledc_channel_config_t servo_channe1 = {
+        .gpio_num = 9,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = LEDC_CHANNEL_2,
+        .timer_sel = LEDC_TIMER_1,
+        .duty = 0,
+        .hpoint = 0,
+        {0}};
+ledc_channel_config_t servo_channe2 = {
+        .gpio_num = 18,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = LEDC_CHANNEL_3,
+        .timer_sel = LEDC_TIMER_1,
+        .duty = 0,
+        .hpoint = 0,
+        {0}};
+ledc_channel_config_t servo_channe3 = {
+        .gpio_num = 19,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = LEDC_CHANNEL_4,
+        .timer_sel = LEDC_TIMER_1,
+        .duty = 0,
+        .hpoint = 0,
+        {0}};
 
-//     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
-
-//     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
-//     ret = esp_bt_controller_init(&bt_cfg);
-//     if (ret) {
-//         ESP_LOGE(GATTS_TAG, "%s initialize controller failed: %s\n", __func__, esp_err_to_name(ret));
-//         return;
-//     }
-
-//     ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
-//     if (ret) {
-//         ESP_LOGE(GATTS_TAG, "%s enable controller failed: %s\n", __func__, esp_err_to_name(ret));
-//         return;
-//     }
-//     ret = esp_bluedroid_init();
-//     if (ret) {
-//         ESP_LOGE(GATTS_TAG, "%s init bluetooth failed: %s\n", __func__, esp_err_to_name(ret));
-//         return;
-//     }
-//     ret = esp_bluedroid_enable();
-//     if (ret) {
-//         ESP_LOGE(GATTS_TAG, "%s enable bluetooth failed: %s\n", __func__, esp_err_to_name(ret));
-//         return;
-//     }
-
-//     ret = esp_ble_gatts_register_callback(gatts_event_handler);
-//     if (ret){
-//         ESP_LOGE(GATTS_TAG, "gatts register error, error code = %x", ret);
-//         return;
-//     }
-//     ret = esp_ble_gap_register_callback(gap_event_handler);
-//     if (ret){
-//         ESP_LOGE(GATTS_TAG, "gap register error, error code = %x", ret);
-//         return;
-//     }
-//     ret = esp_ble_gatts_app_register(PROFILE_A_APP_ID);
-//     if (ret){
-//         ESP_LOGE(GATTS_TAG, "gatts app register error, error code = %x", ret);
-//         return;
-//     }
-//     ret = esp_ble_gatts_app_register(PROFILE_B_APP_ID);
-//     if (ret){
-//         ESP_LOGE(GATTS_TAG, "gatts app register error, error code = %x", ret);
-//         return;
-//     }
-//     esp_err_t local_mtu_ret = esp_ble_gatt_set_local_mtu(500);
-//     if (local_mtu_ret){
-//         ESP_LOGE(GATTS_TAG, "set local  MTU failed, error code = %x", local_mtu_ret);
-//     }
-
-//     return;
-// }
+struct Servo_kinestate a0;
+struct Servo_kinestate a1;
+struct Servo_kinestate a2;
+struct Servo_kinestate a3; 
 
 static void s_task(void *pvParameters);
 static void a_task(void *pvParameters)
@@ -210,95 +168,47 @@ static void mpu6050_task(void *pvParameters)
 
 static void s_task(void *pvParameters)
 {
-    ledc_timer_config_t servo_timer = {
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .duty_resolution = LEDC_TIMER_13_BIT, // resolution of PWM duty
-        .timer_num = LEDC_TIMER_1,
-        .freq_hz = SERVO_FREQUENCY, // frequency of PWM signal
-        .clk_cfg = LEDC_AUTO_CLK,   // Auto select the source clock
-    };
-    ledc_timer_config(&servo_timer);
 
-    ledc_channel_config_t servo_channe0 = {
-        .gpio_num = 8,
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .channel = LEDC_CHANNEL_1,
-        .timer_sel = LEDC_TIMER_1,
-        .duty = 0,
-        .hpoint = 0,
-        {0}};
-    ledc_channel_config(&servo_channe0);
-    ledc_channel_config_t servo_channe1 = {
-        .gpio_num = 9,
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .channel = LEDC_CHANNEL_2,
-        .timer_sel = LEDC_TIMER_1,
-        .duty = 0,
-        .hpoint = 0,
-        {0}};
-    ledc_channel_config(&servo_channe1);
-    ledc_channel_config_t servo_channe2 = {
-        .gpio_num = 18,
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .channel = LEDC_CHANNEL_3,
-        .timer_sel = LEDC_TIMER_1,
-        .duty = 0,
-        .hpoint = 0,
-        {0}};
-    ledc_channel_config(&servo_channe2);
-    ledc_channel_config_t servo_channe3 = {
-        .gpio_num = 19,
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .channel = LEDC_CHANNEL_4,
-        .timer_sel = LEDC_TIMER_1,
-        .duty = 0,
-        .hpoint = 0,
-        {0}};
-    ledc_channel_config(&servo_channe3);
-
-    testservo(servo_channe0,servo_channe2);
-    testservo(servo_channe1,servo_channe3);
-
-    struct Servo_kinestate a0 = {
+    a0 = {
         .servo_channel = &servo_channe0,
-        .timestep = 0.0009,
+        .timestep = 0.0009*5,
         .thetai = 0,
         .thetaf = 180,
         .omegai = 0,
         .omegaf = 0,
-        .acci = 5,
-        .accf = 15,
-        .tf = 0.8};
-    struct Servo_kinestate a1 = {
+        .acci = 35,
+        .accf = 35,
+        .tf = 0.3};
+    a1 = {
         .servo_channel = &servo_channe1,
-        .timestep = 0.0009,
+        .timestep = 0.0009*5,
         .thetai = 0,
         .thetaf = 45,
         .omegai = 0,
         .omegaf = 0,
-        .acci = 5,
-        .accf = 15,
-        .tf = 0.8};
-    struct Servo_kinestate a2 = {
+        .acci = 35,
+        .accf = 35,
+        .tf = 0.3};
+    a2 = {
         .servo_channel = &servo_channe2,
-        .timestep = 0.0009,
+        .timestep = 0.0009*5,
         .thetai = 0,
         .thetaf = 180,
         .omegai = 0,
         .omegaf = 0,
-        .acci = 5,
-        .accf = 15,
-        .tf = 0.8};
-    struct Servo_kinestate a3 = {
+        .acci = 35,
+        .accf = 35,
+        .tf = 0.3};
+    a3 = {
         .servo_channel = &servo_channe3,
-        .timestep = 0.0009,
+        .timestep = 0.0009*5,
         .thetai = 0,
         .thetaf = 45,
         .omegai = 0,
         .omegaf = 0,
-        .acci = 5,
-        .accf = 15,
-        .tf = 0.8};
+        .acci = 35,
+        .accf = 35,
+        .tf = 0.3};
     // printf("1thetai:%lf,thetaf:%lf\n",a0.thetai,a0.thetaf);
     // vTaskDelay(1000 / portTICK_RATE_MS);
 
@@ -315,31 +225,45 @@ static void s_task(void *pvParameters)
 
     // servo_control_task();
     
-    for (;;)
+    // for (;;)
+    // {
+    //     printf(" Pitch:%6.3f \n", mpu6050_data.pitch);
+    //     if (mpu6050_data.pitch < -45)
+    //     {
+    //         if (myHandle == NULL)
+    //         {
+    //             // xTaskCreatePinnedToCore(task,"myTask",1024,NULL,1,&myHandle);
+    //             xTaskCreatePinnedToCore(&task, "myTask", 2048 * 8, NULL, 7, &myHandle, 0);
+    //         }
+    //     }
+    //     if (myHandle != NULL)
+    //     {
+    //         vTaskDelete(myHandle);
+    //     }
+    //     vTaskDelay(100 / portTICK_RATE_MS);
+    //     // ear_task(mpu6050_data, servo_timer, servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+    //     // Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+    // }
+    for(;;)
     {
-        printf(" Pitch:%6.3f \n", mpu6050_data.pitch);
-        if (mpu6050_data.pitch < -45)
-        {
-            if (myHandle == NULL)
-            {
-                // xTaskCreatePinnedToCore(task,"myTask",1024,NULL,1,&myHandle);
-                xTaskCreatePinnedToCore(&task, "myTask", 2048 * 8, NULL, 7, &myHandle, 0);
-            }
-        }
-        if (myHandle != NULL)
-        {
-            vTaskDelete(myHandle);
-        }
-        vTaskDelay(100 / portTICK_RATE_MS);
-        // ear_task(mpu6050_data, servo_timer, servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-        // Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+        vTaskDelay(200/portTICK_RATE_MS);
+        ESP_LOGI("tag","a");
     }
+    vTaskDelete(NULL);
 }
 
 
 extern "C" void app_main(void)
 {
-
+    ledc_timer_config(&servo_timer);
+    ledc_channel_config(&servo_channe0);
+    ledc_channel_config(&servo_channe1);
+    ledc_channel_config(&servo_channe2);
+    ledc_channel_config(&servo_channe3);
+    vTaskDelay(1);
+    testservo(servo_channe0,servo_channe2);
+    testservo(servo_channe1,servo_channe3);
+    vTaskDelay(1000/portTICK_RATE_MS);
     printf("hello world\n");
 
     xTaskCreatePinnedToCore(&mpu6050_task, "mpu6050_task", 2048 * 2, NULL, 5, NULL, 0);
