@@ -78,8 +78,9 @@ struct Servo_kinestate* servo_kinestate2, struct Servo_kinestate* servo_kinestat
             ledc_set_duty(servo_channe3.speed_mode, servo_channe3.channel, duty);
             ledc_update_duty(servo_channe3.speed_mode, servo_channe3.channel);
             // ets_delay_us(1000000 * (*servo_kinestate0).timestep);
+            vTaskDelay(5/portTICK_RATE_MS);
         }
-        vTaskDelay(10/portTICK_RATE_MS);
+        
     // printf("0thetai:%lf,thetaf:%lf\n",servo_kinestate0.thetai,servo_kinestate0.thetaf);
     // update_Servo_kinestate(servo_kinestate0);
     // printf("1thetai:%lf,thetaf:%lf\n",(*servo_kinestate0).thetai,(*servo_kinestate0).thetaf);

@@ -56,6 +56,7 @@ extern "C"
 #define I2C_NUM I2C_NUM_0
 ///
 struct mpu6050_Data mpu6050_data;
+TaskHandle_t myHandle = NULL;
 // void app_main(void)
 // {
 //     ledc_channel_config_t servo_channel;
@@ -128,11 +129,23 @@ struct mpu6050_Data mpu6050_data;
 //     return;
 // }
 
+static void s_task(void *pvParameters);
+static void a_task(void *pvParameters)
+{
+    printf("task begin\n");
+    for (;;)
+    {
+        ESP_LOGI("a", "a\n");
+        vTaskDelay(200 / portTICK_RATE_MS);
+    }
+    vTaskDelete(NULL);
+}
 static void task(void *pvParameters)
 {
-    while(1){
-    ESP_LOGE("TAG", "Sub task is running");
-    // vTaskDelay(1000/portTICK_RATE_MS);
+    while (1)
+    {
+        ESP_LOGE("TAG", "Sub task is running");
+        // vTaskDelay(1000/portTICK_RATE_MS);
     }
     vTaskDelete(NULL);
 }
@@ -169,8 +182,21 @@ static void mpu6050_task(void *pvParameters)
         if (esp_log_timestamp() / 100 != lasttime)
         {
             lasttime = esp_log_timestamp() / 100;
-            printf("Samples:%d \n", lasttime);
+            printf("Samples:%d ", lasttime);
+            printf("Pitch:%lf \n", mpu6050_data.pitch);
             count = 0;
+            if (mpu6050_data.pitch < -45)
+            {
+                if (myHandle == NULL)
+                {
+                    xTaskCreatePinnedToCore(&s_task, "a_task", 1024 * 10, NULL, 6, &myHandle, 0);
+                }
+            }
+            if(myHandle != NULL&&mpu6050_data.pitch>0)
+            {
+                vTaskDelete(myHandle);
+                myHandle=NULL;
+            }
             // printf(" Acc:(%4.2f,%4.2f,%4.2f)", mpu6050_data.ax, mpu6050_data.ay, mpu6050_data.az);
             // printf("Gyro:(%6.3f,%6.3f,%6.3f)", mpu6050_data.gx, mpu6050_data.gy, mpu6050_data.gz);
             // printf(" Pitch:%6.3f ", mpu6050_data.pitch);
@@ -178,7 +204,7 @@ static void mpu6050_task(void *pvParameters)
             // printf(" FPitch:%6.3f ", mpu6050_data.fpitch);
             // printf(" FRoll:%6.3f \n", mpu6050_data.froll);
         }
-        vTaskDelay(100/portTICK_RATE_MS);
+        vTaskDelay(100 / portTICK_RATE_MS);
     }
 }
 
@@ -230,8 +256,8 @@ static void s_task(void *pvParameters)
         {0}};
     ledc_channel_config(&servo_channe3);
 
-    // testservo(servo_channe0,servo_channe2);
-    // testservo(servo_channe1,servo_channe3);
+    testservo(servo_channe0,servo_channe2);
+    testservo(servo_channe1,servo_channe3);
 
     struct Servo_kinestate a0 = {
         .servo_channel = &servo_channe0,
@@ -276,7 +302,7 @@ static void s_task(void *pvParameters)
     // printf("1thetai:%lf,thetaf:%lf\n",a0.thetai,a0.thetaf);
     // vTaskDelay(1000 / portTICK_RATE_MS);
 
-    // Servo_run(servo_channe0, servo_channe1,servo_channe2, servo_channe3, &a0, &a1,&a2,&a3);
+    Servo_run(servo_channe0, servo_channe1,servo_channe2, servo_channe3, &a0, &a1,&a2,&a3);
     // printf("%f,%f,%f\n", a2.omegai, a2.acci, a2.thetai);
     // MPU6050 mpu(i2c_gpio_scl, i2c_gpio_sda, I2C_NUM);
     // if (!mpu.init())
@@ -288,34 +314,56 @@ static void s_task(void *pvParameters)
     //  mpu6050_task();
 
     // servo_control_task();
-    TaskHandle_t myHandle = NULL;
+    
     for (;;)
     {
         printf(" Pitch:%6.3f \n", mpu6050_data.pitch);
-        if(mpu6050_data.pitch<-45)
+        if (mpu6050_data.pitch < -45)
         {
-            if(myHandle==NULL)
+            if (myHandle == NULL)
             {
                 // xTaskCreatePinnedToCore(task,"myTask",1024,NULL,1,&myHandle);
-                xTaskCreatePinnedToCore(&task, "myTask", 2048 * 8, NULL, 6, &myHandle, 0);
-            } 
+                xTaskCreatePinnedToCore(&task, "myTask", 2048 * 8, NULL, 7, &myHandle, 0);
+            }
         }
-        if(myHandle!=NULL)
-            {
-                vTaskDelete(myHandle);
-                } 
-        vTaskDelay(100/portTICK_RATE_MS);
+        if (myHandle != NULL)
+        {
+            vTaskDelete(myHandle);
+        }
+        vTaskDelay(100 / portTICK_RATE_MS);
         // ear_task(mpu6050_data, servo_timer, servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
         // Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
     }
 }
 
+
 extern "C" void app_main(void)
 {
-    
+
     printf("hello world\n");
 
     xTaskCreatePinnedToCore(&mpu6050_task, "mpu6050_task", 2048 * 2, NULL, 5, NULL, 0);
 
-    xTaskCreatePinnedToCore(&s_task, "s_task", 1024 * 6, NULL, 6, NULL, 0);
+    // xTaskCreatePinnedToCore(&s_task, "s_task", 1024 * 6, NULL, 6, NULL, 0);
+    // for(int i=0;i<255;i++)
+    // {
+    //     vTaskDelay(200/portTICK_RATE_MS);
+    //     printf("i=%d\n",i);
+    //     if(i==25)
+    //     {
+    //         if(myHandle==NULL)
+    //         {
+    //             xTaskCreatePinnedToCore(&a_task, "a_task", 1024 * 6, NULL, 6, &myHandle, 0);
+    //         }
+    //     }
+    //     if (i>50)
+    //     {
+    //          if(myHandle!=NULL)
+    //         {
+    //             vTaskDelete(myHandle);
+    //             myHandle = NULL;
+    //         }
+    //     }
+
+    // }
 }
