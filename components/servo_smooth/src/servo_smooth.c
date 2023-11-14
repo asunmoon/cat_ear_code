@@ -18,7 +18,7 @@ uint32_t convert_servo_angle_to_duty(double angle)
     return (int)(SERVO_FREQUENCY * us * 8191 / 1000000); // 仅针对LEDC_TIMER_13_BIT
 }
 
-void five_data(struct Servo_kinestate servo_kinestate0,double* theta0,double* omega0,double* acc0,double t)
+void five_data(struct Servo_kinestate servo_kinestate0, double *theta0, double *omega0, double *acc0, double t)
 {
     double a0 = 0;
     double a1 = 0;
@@ -39,66 +39,69 @@ void five_data(struct Servo_kinestate servo_kinestate0,double* theta0,double* om
 
 void update_Servo_kinestate(struct Servo_kinestate servo_kinestate0)
 {
-    servo_kinestate0.thetai=servo_kinestate0.thetaf;
-    servo_kinestate0.omegai=servo_kinestate0.omegaf;
-    servo_kinestate0.acci=servo_kinestate0.accf;
+    servo_kinestate0.thetai = servo_kinestate0.thetaf;
+    servo_kinestate0.omegai = servo_kinestate0.omegaf;
+    servo_kinestate0.acci = servo_kinestate0.accf;
 }
 
-void Servo_run(ledc_channel_config_t  servo_channe0,ledc_channel_config_t  servo_channe1,
-ledc_channel_config_t  servo_channe2,ledc_channel_config_t  servo_channe3,
-struct Servo_kinestate* servo_kinestate0, struct Servo_kinestate* servo_kinestate1,
-struct Servo_kinestate* servo_kinestate2, struct Servo_kinestate* servo_kinestate3)
+void Servo_run(ledc_channel_config_t servo_channe0, ledc_channel_config_t servo_channe1,
+               ledc_channel_config_t servo_channe2, ledc_channel_config_t servo_channe3,
+               struct Servo_kinestate *servo_kinestate0, struct Servo_kinestate *servo_kinestate1,
+               struct Servo_kinestate *servo_kinestate2, struct Servo_kinestate *servo_kinestate3)
 {
     double theta0;
-    double omega0 ;
-    double acc0 ;
+    double omega0;
+    double acc0;
     u_int32_t duty;
-    //printf("0thetai:%d,thetaf:%d\n",servo_kinestate0.thetai,servo_kinestate0.thetaf);
-    
-    for (double t = 0; t <= (*servo_kinestate0).tf; t += (*servo_kinestate0).timestep)
-        { 
-            five_data(*servo_kinestate0,&theta0,&omega0,&acc0,t);
-            duty = convert_servo_angle_to_duty(theta0);
-            // vTaskDelay(100/portTICK_RATE_MS);
-            ledc_set_duty(servo_channe0.speed_mode, servo_channe0.channel, duty);
-            ledc_update_duty(servo_channe0.speed_mode, servo_channe0.channel);
-            
-            five_data(*servo_kinestate1,&theta0,&omega0,&acc0,t);
-            duty = convert_servo_angle_to_duty(theta0);
-            ledc_set_duty(servo_channe1.speed_mode, servo_channe1.channel, duty);
-            ledc_update_duty(servo_channe1.speed_mode, servo_channe1.channel);
-            
-            five_data(*servo_kinestate2,&theta0,&omega0,&acc0,t);
-            duty = convert_servo_angle_to_duty(theta0);
-            ledc_set_duty(servo_channe2.speed_mode, servo_channe2.channel, duty);
-            ledc_update_duty(servo_channe2.speed_mode, servo_channe2.channel);
+    // printf("0thetai:%d,thetaf:%d\n",servo_kinestate0.thetai,servo_kinestate0.thetaf);
 
-            five_data(*servo_kinestate3,&theta0,&omega0,&acc0,t);
-            duty = convert_servo_angle_to_duty(theta0);
-            ledc_set_duty(servo_channe3.speed_mode, servo_channe3.channel, duty);
-            ledc_update_duty(servo_channe3.speed_mode, servo_channe3.channel);
-            // ets_delay_us(1000000 * (*servo_kinestate0).timestep);
-            vTaskDelay(10/portTICK_RATE_MS);
+    for (double t = 0; t <= (*servo_kinestate0).tf; t += (*servo_kinestate0).timestep)
+    {
+        five_data(*servo_kinestate0, &theta0, &omega0, &acc0, t);
+        duty = convert_servo_angle_to_duty(theta0);
+        // vTaskDelay(100/portTICK_RATE_MS);
+        ledc_set_duty(servo_channe0.speed_mode, servo_channe0.channel, duty);
+        ledc_update_duty(servo_channe0.speed_mode, servo_channe0.channel);
+
+        five_data(*servo_kinestate1, &theta0, &omega0, &acc0, t);
+        duty = convert_servo_angle_to_duty(theta0);
+        ledc_set_duty(servo_channe1.speed_mode, servo_channe1.channel, duty);
+        ledc_update_duty(servo_channe1.speed_mode, servo_channe1.channel);
+
+        five_data(*servo_kinestate2, &theta0, &omega0, &acc0, t);
+        duty = convert_servo_angle_to_duty(theta0);
+        ledc_set_duty(servo_channe2.speed_mode, servo_channe2.channel, duty);
+        ledc_update_duty(servo_channe2.speed_mode, servo_channe2.channel);
+
+        five_data(*servo_kinestate3, &theta0, &omega0, &acc0, t);
+        duty = convert_servo_angle_to_duty(theta0);
+        ledc_set_duty(servo_channe3.speed_mode, servo_channe3.channel, duty);
+        ledc_update_duty(servo_channe3.speed_mode, servo_channe3.channel);
+        // ets_delay_us(1000000 * (*servo_kinestate0).timestep);
+        if (servo_kinestate1->tf>=0.1)
+        {
+            vTaskDelay(10 / portTICK_RATE_MS);
         }
-        
+    }
+
     // printf("0thetai:%lf,thetaf:%lf\n",servo_kinestate0.thetai,servo_kinestate0.thetaf);
     // update_Servo_kinestate(servo_kinestate0);
     // printf("1thetai:%lf,thetaf:%lf\n",(*servo_kinestate0).thetai,(*servo_kinestate0).thetaf);
-    (*servo_kinestate0).thetai=(*servo_kinestate0).thetaf;
-    (*servo_kinestate0).omegai=(*servo_kinestate0).omegaf;
-    (*servo_kinestate0).acci=(*servo_kinestate0).accf;
+    (*servo_kinestate0).thetai = (*servo_kinestate0).thetaf;
+    (*servo_kinestate0).omegai = (*servo_kinestate0).omegaf;
+    (*servo_kinestate0).acci = (*servo_kinestate0).accf;
     // printf("2thetai:%lf,thetaf:%lf\n",(*servo_kinestate0).thetai,(*servo_kinestate0).thetaf);
-    (*servo_kinestate1).thetai=(*servo_kinestate1).thetaf;
-    (*servo_kinestate1).omegai=(*servo_kinestate1).omegaf;
-    (*servo_kinestate1).acci=(*servo_kinestate1).accf;
+    (*servo_kinestate1).thetai = (*servo_kinestate1).thetaf;
+    (*servo_kinestate1).omegai = (*servo_kinestate1).omegaf;
+    (*servo_kinestate1).acci = (*servo_kinestate1).accf;
 
-    (*servo_kinestate2).thetai=(*servo_kinestate2).thetaf;
-    (*servo_kinestate2).omegai=(*servo_kinestate2).omegaf;
-    (*servo_kinestate2).acci=(*servo_kinestate2).accf;
+    (*servo_kinestate2).thetai = (*servo_kinestate2).thetaf;
+    (*servo_kinestate2).omegai = (*servo_kinestate2).omegaf;
+    (*servo_kinestate2).acci = (*servo_kinestate2).accf;
 
-    (*servo_kinestate3).thetai=(*servo_kinestate3).thetaf;
-    (*servo_kinestate3).omegai=(*servo_kinestate3).omegaf;
-    (*servo_kinestate3).acci=(*servo_kinestate3).accf;
+    (*servo_kinestate3).thetai = (*servo_kinestate3).thetaf;
+    (*servo_kinestate3).omegai = (*servo_kinestate3).omegaf;
+    (*servo_kinestate3).acci = (*servo_kinestate3).accf;
     // vTaskDelay(10000/portTICK_RATE_MS);
     // update_Servo_kinestate(servo_kinestate1);
     // update_Servo_kinestate(servo_kinestate2);
@@ -132,7 +135,7 @@ struct Servo_kinestate* servo_kinestate2, struct Servo_kinestate* servo_kinestat
     //     // // ledc_update_duty(servo_kinestate1.servo_channel->speed_mode, servo_kinestate1.servo_channel->channel);
     //     // ledc_set_duty(servo_channel.speed_mode, servo_channel.channel, duty);
     //     // ledc_update_duty(servo_channel.speed_mode, servo_channel.channel);// servo1
-        
+
     //     ets_delay_us(1000000 * servo_kinestate0.timestep);
     //     printf("t:%f\n", t);
     //     t0 = t;
@@ -145,10 +148,9 @@ struct Servo_kinestate* servo_kinestate2, struct Servo_kinestate* servo_kinestat
     // servo_kinestate1.acci = acc0_1;
     // servo_kinestate1.thetai = theta0_1;
     // vTaskDelay(10 / portTICK_RATE_MS);
-    
 }
 
-void testservo(ledc_channel_config_t servo_channel,ledc_channel_config_t servo_channe2)
+void testservo(ledc_channel_config_t servo_channel, ledc_channel_config_t servo_channe2)
 {
     uint16_t duty; // from 0 to 8*1024-1
     for (int i = 0; i <= 200; i += 10)
@@ -159,7 +161,7 @@ void testservo(ledc_channel_config_t servo_channel,ledc_channel_config_t servo_c
         ledc_update_duty(servo_channel.speed_mode, servo_channel.channel);
         ledc_set_duty(servo_channe2.speed_mode, servo_channe2.channel, duty);
         ledc_update_duty(servo_channe2.speed_mode, servo_channe2.channel);
-        
+
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 
@@ -187,9 +189,8 @@ void servo_control_task_begin(ledc_timer_config_t servo_timer, ledc_channel_conf
     servo_timer.timer_num = LEDC_TIMER_1;            // timer index
     servo_timer.clk_cfg = LEDC_AUTO_CLK;             // Auto select the source clock
 
-
     ledc_timer_config(&servo_timer);
-    
+
     servo_channel.channel = 1;
     servo_channel.duty = 0;
     servo_channel.gpio_num = 8;
@@ -198,7 +199,7 @@ void servo_control_task_begin(ledc_timer_config_t servo_timer, ledc_channel_conf
     servo_channel.timer_sel = LEDC_TIMER_1;
     servo_channel.flags.output_invert = 0;
     // servo_channel.intr_type=LEDC_INTR_DISABLE;
-    
+
     ledc_channel_config(&servo_channel);
 
     servo_channe2.channel = 2;
