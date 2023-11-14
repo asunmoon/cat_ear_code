@@ -48,8 +48,5 @@ void Servo_run(ledc_channel_config_t  servo_channe0,ledc_channel_config_t  servo
 ledc_channel_config_t  servo_channe3,ledc_channel_config_t  servo_channe4,
 struct Servo_kinestate* servo_kinestate0, struct Servo_kinestate* servo_kinestate1,
 struct Servo_kinestate* servo_kinestate3, struct Servo_kinestate* servo_kinestate4);
-void servo_control_task_begin(ledc_timer_config_t servo_timer, ledc_channel_config_t servo_channel
-                                , ledc_channel_config_t servo_channe2);
 
-void servo_control_task();
 void testservo(ledc_channel_config_t servo_channel,ledc_channel_config_t servo_channe2);

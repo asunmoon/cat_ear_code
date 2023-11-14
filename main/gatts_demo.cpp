@@ -88,11 +88,72 @@ struct Servo_kinestate a0;
 struct Servo_kinestate a1;
 struct Servo_kinestate a2;
 struct Servo_kinestate a3;
+
 static void task_0(void *pvParameters);
 static void task_1(void *pvParameters);
 static void task_2(void *pvParameters);
 static void task_3(void *pvParameters);
 static void task_4(void *pvParameters);
+void settf(double M);
+void which_run();
+static void mpu6050_task(void *pvParameters);
+//***********************************************
+extern "C" void app_main(void)
+{
+    ledc_timer_config(&servo_timer);
+    ledc_channel_config(&servo_channe0);
+    ledc_channel_config(&servo_channe1);
+    ledc_channel_config(&servo_channe2);
+    ledc_channel_config(&servo_channe3);
+    vTaskDelay(1);
+    a0 = {
+        .servo_channel = &servo_channe0,
+        .timestep = 0.0009 * 5,
+        .thetai = 0,
+        .thetaf = 90,
+        .omegai = 0,
+        .omegaf = 0,
+        .acci = 35,
+        .accf = 35,
+        .tf = 0.3};
+    a1 = {
+        .servo_channel = &servo_channe1,
+        .timestep = 0.0009 * 5,
+        .thetai = 0,
+        .thetaf = 40,
+        .omegai = 0,
+        .omegaf = 0,
+        .acci = 35,
+        .accf = 35,
+        .tf = 0.3};
+    a2 = {
+        .servo_channel = &servo_channe2,
+        .timestep = 0.0009 * 5,
+        .thetai = 0,
+        .thetaf = 90,
+        .omegai = 0,
+        .omegaf = 0,
+        .acci = 35,
+        .accf = 35,
+        .tf = 0.3};
+    a3 = {
+        .servo_channel = &servo_channe3,
+        .timestep = 0.0009 * 5,
+        .thetai = 0,
+        .thetaf = 140,
+        .omegai = 0,
+        .omegaf = 0,
+        .acci = 35,
+        .accf = 35,
+        .tf = 0.3};
+    // testservo(servo_channe0, servo_channe2);
+    // testservo(servo_channe1, servo_channe3);
+    vTaskDelay(1000 / portTICK_RATE_MS);
+    printf("hello world\n");
+    Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+    xTaskCreatePinnedToCore(&mpu6050_task, "mpu6050_task", 2048 * 2, NULL, 5, NULL, 0);
+}
+//***********************************************
 void settf(double M)
 {
     a0.tf = M;
@@ -192,47 +253,8 @@ static void task_4(void *pvParameters)
         printf("random0 % 10=%d\n", (random0 % 10));
         if (true || random0 % 10 == 3)
         {
-            // random0 = esp_random();
-            {
-                // u_int32_t duty = convert_servo_angle_to_duty(140);
-                // ledc_set_duty(servo_channe1.speed_mode, servo_channe1.channel, duty);
-                // ledc_update_duty(servo_channe1.speed_mode, servo_channe1.channel);
-                // duty = convert_servo_angle_to_duty(45);
-                // ledc_set_duty(servo_channe3.speed_mode, servo_channe3.channel, duty);
-                // ledc_update_duty(servo_channe3.speed_mode, servo_channe3.channel);
-                // vTaskDelay(200 / portTICK_RATE_MS);
-                // vTaskDelay(10 / portTICK_RATE_MS);
-
-                // duty = convert_servo_angle_to_duty(115);
-                // ledc_set_duty(servo_channe1.speed_mode, servo_channe1.channel, duty);
-                // ledc_update_duty(servo_channe1.speed_mode, servo_channe1.channel);
-                // duty = convert_servo_angle_to_duty(90);
-                // ledc_set_duty(servo_channe3.speed_mode, servo_channe3.channel, duty);
-                // ledc_update_duty(servo_channe3.speed_mode, servo_channe3.channel);
-                // vTaskDelay(200 / portTICK_RATE_MS);
-
-                // u_int32_t duty1 = convert_servo_angle_to_duty(141);
-                // ledc_set_duty(servo_channe1.speed_mode, servo_channe1.channel, duty1);
-                // ledc_update_duty(servo_channe1.speed_mode, servo_channe1.channel);
-                // u_int32_t duty2 = convert_servo_angle_to_duty(46);
-                // ledc_set_duty(servo_channe3.speed_mode, servo_channe3.channel, duty2);
-                // ledc_update_duty(servo_channe3.speed_mode, servo_channe3.channel);
-                // vTaskDelay(200 / portTICK_RATE_MS);
-                // vTaskDelay(10 / portTICK_RATE_MS);
-                // for(int i=15;i>0;i--)
-                // {
-                // duty1 = duty1+i;
-                // ledc_set_duty(servo_channe1.speed_mode, servo_channe1.channel, duty1);
-                // ledc_update_duty(servo_channe1.speed_mode, servo_channe1.channel);
-                // duty2 = duty2+i;
-                // ledc_set_duty(servo_channe3.speed_mode, servo_channe3.channel, duty2);
-                // ledc_update_duty(servo_channe3.speed_mode, servo_channe3.channel);
-                // // vTaskDelay(10 / portTICK_RATE_MS);
-                // vTaskDelay(10 / portTICK_RATE_MS);
-                // }
-                // vTaskDelay(10000 / portTICK_RATE_MS);
-            }
-
+            random0 = esp_random();
+            
             { // 弯耳朵
                 a0.timestep = 0.0009 * 5,
                 a0.tf = 0.05;
@@ -576,26 +598,6 @@ void which_run()
         }
     }
 }
-static void s_task(void *pvParameters);
-static void a_task(void *pvParameters)
-{
-    printf("task begin\n");
-    for (;;)
-    {
-        ESP_LOGI("a", "a\n");
-        vTaskDelay(200 / portTICK_RATE_MS);
-    }
-    vTaskDelete(NULL);
-}
-static void task(void *pvParameters)
-{
-    while (1)
-    {
-        ESP_LOGE("TAG", "Sub task is running");
-        // vTaskDelay(1000/portTICK_RATE_MS);
-    }
-    vTaskDelete(NULL);
-}
 static void mpu6050_task(void *pvParameters)
 {
     MPU6050 mpu(i2c_gpio_scl, i2c_gpio_sda, I2C_NUM);
@@ -633,18 +635,6 @@ static void mpu6050_task(void *pvParameters)
             printf("Pitch:%lfRoll:%lf \n", mpu6050_data.pitch,mpu6050_data.roll);
             count = 0;
             which_run();
-            // if (mpu6050_data.pitch < -45)
-            // {
-            //     if (myHandle == NULL)
-            //     {
-            //         xTaskCreatePinnedToCore(&s_task, "a_task", 1024 * 10, NULL, 6, &myHandle, 0);
-            //     }
-            // }
-            // if (myHandle != NULL && mpu6050_data.pitch > 0)
-            // {
-            //     vTaskDelete(myHandle);
-            //     myHandle = NULL;
-            // }
             // printf(" Acc:(%4.2f,%4.2f,%4.2f)", mpu6050_data.ax, mpu6050_data.ay, mpu6050_data.az);
             // printf("Gyro:(%6.3f,%6.3f,%6.3f)", mpu6050_data.gx, mpu6050_data.gy, mpu6050_data.gz);
             // printf(" Pitch:%6.3f ", mpu6050_data.pitch);
@@ -656,144 +646,5 @@ static void mpu6050_task(void *pvParameters)
     }
 }
 
-static void s_task(void *pvParameters)
-{
 
-    a0 = {
-        .servo_channel = &servo_channe0,
-        .timestep = 0.0009 * 5,
-        .thetai = 0,
-        .thetaf = 180,
-        .omegai = 0,
-        .omegaf = 0,
-        .acci = 35,
-        .accf = 35,
-        .tf = 0.3};
-    a1 = {
-        .servo_channel = &servo_channe1,
-        .timestep = 0.0009 * 5,
-        .thetai = 0,
-        .thetaf = 45,
-        .omegai = 0,
-        .omegaf = 0,
-        .acci = 35,
-        .accf = 35,
-        .tf = 0.3};
-    a2 = {
-        .servo_channel = &servo_channe2,
-        .timestep = 0.0009 * 5,
-        .thetai = 0,
-        .thetaf = 180,
-        .omegai = 0,
-        .omegaf = 0,
-        .acci = 35,
-        .accf = 35,
-        .tf = 0.3};
-    a3 = {
-        .servo_channel = &servo_channe3,
-        .timestep = 0.0009 * 5,
-        .thetai = 0,
-        .thetaf = 45,
-        .omegai = 0,
-        .omegaf = 0,
-        .acci = 35,
-        .accf = 35,
-        .tf = 0.3};
-    // printf("1thetai:%lf,thetaf:%lf\n",a0.thetai,a0.thetaf);
-    // vTaskDelay(1000 / portTICK_RATE_MS);
 
-    Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-    // printf("%f,%f,%f\n", a2.omegai, a2.acci, a2.thetai);
-    // MPU6050 mpu(i2c_gpio_scl, i2c_gpio_sda, I2C_NUM);
-    // if (!mpu.init())
-    // {
-    //     ESP_LOGE("mpu6050", "init failed!");
-    //     vTaskDelay(0);
-    // }
-    // ESP_LOGI("mpu6050", "init success!");
-    //  mpu6050_task();
-
-    // servo_control_task();
-
-    // for (;;)
-    // {
-    //     printf(" Pitch:%6.3f \n", mpu6050_data.pitch);
-    //     if (mpu6050_data.pitch < -45)
-    //     {
-    //         if (myHandle == NULL)
-    //         {
-    //             // xTaskCreatePinnedToCore(task,"myTask",1024,NULL,1,&myHandle);
-    //             xTaskCreatePinnedToCore(&task, "myTask", 2048 * 8, NULL, 7, &myHandle, 0);
-    //         }
-    //     }
-    //     if (myHandle != NULL)
-    //     {
-    //         vTaskDelete(myHandle);
-    //     }
-    //     vTaskDelay(100 / portTICK_RATE_MS);
-    //     // ear_task(mpu6050_data, servo_timer, servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-    //     // Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-    // }
-    for (;;)
-    {
-        vTaskDelay(200 / portTICK_RATE_MS);
-        ESP_LOGI("tag", "a");
-    }
-    vTaskDelete(NULL);
-}
-
-extern "C" void app_main(void)
-{
-    ledc_timer_config(&servo_timer);
-    ledc_channel_config(&servo_channe0);
-    ledc_channel_config(&servo_channe1);
-    ledc_channel_config(&servo_channe2);
-    ledc_channel_config(&servo_channe3);
-    vTaskDelay(1);
-    a0 = {
-        .servo_channel = &servo_channe0,
-        .timestep = 0.0009 * 5,
-        .thetai = 0,
-        .thetaf = 90,
-        .omegai = 0,
-        .omegaf = 0,
-        .acci = 35,
-        .accf = 35,
-        .tf = 0.3};
-    a1 = {
-        .servo_channel = &servo_channe1,
-        .timestep = 0.0009 * 5,
-        .thetai = 0,
-        .thetaf = 40,
-        .omegai = 0,
-        .omegaf = 0,
-        .acci = 35,
-        .accf = 35,
-        .tf = 0.3};
-    a2 = {
-        .servo_channel = &servo_channe2,
-        .timestep = 0.0009 * 5,
-        .thetai = 0,
-        .thetaf = 90,
-        .omegai = 0,
-        .omegaf = 0,
-        .acci = 35,
-        .accf = 35,
-        .tf = 0.3};
-    a3 = {
-        .servo_channel = &servo_channe3,
-        .timestep = 0.0009 * 5,
-        .thetai = 0,
-        .thetaf = 140,
-        .omegai = 0,
-        .omegaf = 0,
-        .acci = 35,
-        .accf = 35,
-        .tf = 0.3};
-    // testservo(servo_channe0, servo_channe2);
-    // testservo(servo_channe1, servo_channe3);
-    vTaskDelay(1000 / portTICK_RATE_MS);
-    printf("hello world\n");
-    Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-    xTaskCreatePinnedToCore(&mpu6050_task, "mpu6050_task", 2048 * 2, NULL, 5, NULL, 0);
-}
