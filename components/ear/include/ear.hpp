@@ -40,12 +40,3 @@ static gpio_num_t i2c_gpio_sda = (gpio_num_t)4;
 static gpio_num_t i2c_gpio_scl = (gpio_num_t)5;
 #define I2C_NUM I2C_NUM_0
 
-extern "C" void ear_task(mpu6050_Data mpu6050_data,ledc_timer_config_t servo_timer,
-ledc_channel_config_t servo_channe0,
-ledc_channel_config_t servo_channe1,
-ledc_channel_config_t servo_channe2,
-ledc_channel_config_t servo_channe3,
-struct Servo_kinestate* a0,
-struct Servo_kinestate* a1,
-struct Servo_kinestate* a2,
-struct Servo_kinestate* a3);
