@@ -74,8 +74,10 @@ void Servo_run(ledc_channel_config_t servo_channe0, ledc_channel_config_t servo_
         // ets_delay_us(1000000 * (*servo_kinestate0).timestep);
         if (servo_kinestate1->tf>=0.1)
         {
+            // printf("wait\n");
             vTaskDelay(10 / portTICK_RATE_MS);
         }
+        vTaskDelay(1 / portTICK_RATE_MS);
     }
 
     

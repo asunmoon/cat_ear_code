@@ -165,16 +165,17 @@ static void task_0(void *pvParameters) // 低头0
 {
     ESP_LOGI("task0","begin");
     for (;;)
-    {
-    }
+     {vTaskDelay(1000/portTICK_RATE_MS);}
     vTaskDelete(NULL);
     ;
 }
 static void task_1(void *pvParameters) // 仰头1
 {
     ESP_LOGI("task1","begin");
+    for(;;){vTaskDelay(1000/portTICK_RATE_MS);}
     u_int32_t random0 = esp_random();
     {
+         
         a0.timestep = 0.0009 * 5,
         a0.thetai = 0,
         a0.thetaf = double(115 + (random0 % 5)),
@@ -226,7 +227,7 @@ static void task_2(void *pvParameters) // 左侧头2
 {
     ESP_LOGI("task2","begin");
     for (;;)
-        ;
+         {vTaskDelay(1000/portTICK_RATE_MS);}
     vTaskDelete(NULL);
     
 }
@@ -234,11 +235,11 @@ static void task_3(void *pvParameters) // 右侧头3
 {
     ESP_LOGI("task3","begin");
     for (;;)
-        ;
+        {vTaskDelay(1000/portTICK_RATE_MS);}
     vTaskDelete(NULL);
     ;
 }
-static void task_4(void *pvParameters)
+static void task_4(void *pvParameters) //中间4
 {
     ESP_LOGI("task4","begin");
     bool i = 0;
@@ -251,10 +252,10 @@ static void task_4(void *pvParameters)
     {
         u_int32_t random0 = esp_random();
         printf("random0 % 10=%d\n", (random0 % 10));
-        if (true || random0 % 10 == 3)
+        if (random0 % 5 == 3)//true ||
         {
             random0 = esp_random();
-            
+            printf("aaaa\n");
             { // 弯耳朵
                 a0.timestep = 0.0009 * 5,
                 a0.tf = 0.05;
@@ -262,8 +263,8 @@ static void task_4(void *pvParameters)
                 a1.timestep = 0.0009 * 5,
                 a1.thetaf = double(144 + (random0 % 11 % 3)),
                 a1.omegaf = 0,
-                a1.acci = double(55 - (random0 % 13 % 3)),
-                a1.accf = 55,
+                a1.acci = double(155 - (random0 % 13 % 3)),
+                a1.accf = 155,
                 a1.tf = 0.05;
                 a2.timestep = 0.0009 * 5,
                 a2.tf = 0.05,
@@ -272,34 +273,36 @@ static void task_4(void *pvParameters)
                 a3.thetai = 115,
                 a3.thetaf = double(41 - (random0 % 17 % 3)),
                 a3.omegaf = 0,
-                a3.acci = double(55 - (random0 % 19 % 3)),
-                a3.accf = 55,
+                a3.acci = double(155 - (random0 % 19 % 3)),
+                a3.accf = 155,
                 a3.tf = 0.05;
                 Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-                vTaskDelay(45 + (random0 % 23 % 10) / portTICK_RATE_MS);
+                vTaskDelay((45 + (random0 % 23 % 5) )/ portTICK_RATE_MS);
             }
+            
             { // 收回耳朵快速
                 a0.timestep = 0.0009 * 5,
                 a0.tf = 0.05;
                 a1.servo_channel = &servo_channe1,
                 a1.timestep = 0.0009 * 5,
-                a1.thetaf = double(43 + (random0 % 29 % 5)),
+                a1.thetaf = double(48 + (random0 % 29 % 5)),
                 a1.omegaf = 0,
-                a1.acci = double(55 - (random0 % 31 % 3)),
-                a1.accf = 55,
+                a1.acci = double(155 - (random0 % 31 % 3)),
+                a1.accf = 155,
                 a1.tf = 0.05;
                 a2.timestep = 0.0009 * 5,
                 a2.tf = 0.05;
                 a3.servo_channel = &servo_channe3,
                 a3.timestep = 0.0009 * 5,
-                a3.thetaf = double(115 - (random0 % 37 % 3)),
+                a3.thetaf = double(108 - (random0 % 37 % 3)),
                 a3.omegaf = 0,
-                a3.acci = double(55 - (random0 % 41 % 3)),
-                a3.accf = 55,
+                a3.acci = double(155 - (random0 % 41 % 3)),
+                a3.accf = 155,
                 a3.tf = 0.05;
                 Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-                vTaskDelay(80 - (random0 % 43 % 17) / portTICK_RATE_MS);
+                vTaskDelay((60 - (random0 % 43 % 17)) / portTICK_RATE_MS);
             }
+            
             { // 弯耳朵
                 a0.timestep = 0.0009 * 5,
                 a0.tf = 0.05;
@@ -307,8 +310,8 @@ static void task_4(void *pvParameters)
                 a1.timestep = 0.0009 * 5,
                 a1.thetaf = double(144 + (random0 % 47 % 3)),
                 a1.omegaf = 0,
-                a1.acci = double(55 - (random0 % 53 % 3)),
-                a1.accf = 55,
+                a1.acci = double(155 - (random0 % 53 % 3)),
+                a1.accf = 155,
                 a1.tf = 0.05;
                 a2.timestep = 0.0009 * 5,
                 a2.tf = 0.05,
@@ -316,12 +319,13 @@ static void task_4(void *pvParameters)
                 a3.timestep = 0.0009 * 5,
                 a3.thetaf = double(41 - (random0 % 61 % 3)),
                 a3.omegaf = 0,
-                a3.acci = double(55 - (random0 % 67 % 3)),
-                a3.accf = 55,
+                a3.acci = double(155 - (random0 % 67 % 3)),
+                a3.accf = 155,
                 a3.tf = 0.05;
                 Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-                vTaskDelay(70 + (random0 % 71 % 11) / portTICK_RATE_MS);
+                vTaskDelay((70 - (random0 % 71 % 11) )/ portTICK_RATE_MS);
             }
+            
             { // 收回耳朵慢速
                 a0.timestep = 0.0009 * 5,
                 a0.tf = 0.08;
@@ -329,8 +333,8 @@ static void task_4(void *pvParameters)
                 a1.timestep = 0.0009 * 5,
                 a1.thetaf = double(43 + (random0 % 73 % 5)),
                 a1.omegaf = 0,
-                a1.acci = double(55 - (random0 % 79 % 3)),
-                a1.accf = 55,
+                a1.acci = double(155 - (random0 % 79 % 3)),
+                a1.accf = 155,
                 a1.tf = 0.08;
                 a2.timestep = 0.0009 * 5,
                 a2.tf = 0.08;
@@ -338,165 +342,186 @@ static void task_4(void *pvParameters)
                 a3.timestep = 0.0009 * 5,
                 a3.thetaf = double(115 - (random0 % 83 % 3)),
                 a3.omegaf = 0,
-                a3.acci = double(55 - (random0 % 89 % 3)),
-                a3.accf = 55,
+                a3.acci = double(155 - (random0 % 89 % 3)),
+                a3.accf = 155,
                 a3.tf = 0.08;
                 Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
                 vTaskDelay(1500 / portTICK_RATE_MS);
             }
 
-            {
-                // a0.timestep = 0.0009 * 5,
-                // a0.tf = 0.3;
-                // a1.servo_channel = &servo_channe1,
-                // a1.timestep = 0.0009 * 5,
-                // a1.thetai = 145,
-                // a1.thetaf = double(43 + (random0 % 17 % 5)),
-                // // .omegai = 0,
-                //     a1.omegaf = 0,
-                // a1.acci = double(55 - (random0 % 19 % 3)),
-                // a1.accf = 55,
-                // a1.tf = 0.3;
-                // a2.timestep = 0.0009 * 5,
-                // a2.tf = 0.3;
-                // a3.servo_channel = &servo_channe3,
-                // a3.timestep = 0.0009 * 5,
-                // a3.thetai = 40,
-                // a3.thetaf = double(115 - (random0 % 61 % 5)),
-                // // .omegai = 0,
-                //     a3.omegaf = 0,
-                // a3.acci = double(55 - (random0 % 57 % 3)),
-                // a3.accf = 55,
-                // a3.tf = 0.3;
-                // Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-
-                // for (int i = 2; i > 0; i--)
-                // {
-
-                //         a1.servo_channel = &servo_channe1,
-                //         a1.timestep = 0.0009 * 5,
-                //         // .thetai = 0,
-                //         a1.thetaf = double(140 ),
-                //         a1.omegai = double(140),
-                //         a1.omegaf = 0,
-                //         a1.acci = 55,
-                //         a1.accf = 35,
-                //         a1.tf = 0.25;
-
-                //         a3.servo_channel = &servo_channe3,
-                //         a3.timestep = 0.0009 * 5,
-                //         // .thetai = 0,
-                //         a3.thetaf = double(65 ),
-                //         a3.omegai = double(65 ),
-                //         a3.omegaf = 0,
-                //         a3.acci = 50,
-                //         a3.accf = 35,
-                //         a3.tf = 0.25;
-                //     printf("%d:1a1=%lf,a3=%lf\n",i,a1.thetai,a3.thetai);
-                //     // Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-                //     u_int32_t  duty = convert_servo_angle_to_duty(140);
-                //     ledc_set_duty(servo_channe1.speed_mode, servo_channe1.channel, duty);
-                //     ledc_update_duty(servo_channe1.speed_mode, servo_channe1.channel);
-                //       duty = convert_servo_angle_to_duty(45);
-                //     ledc_set_duty(servo_channe3.speed_mode, servo_channe3.channel, duty);
-                //     ledc_update_duty(servo_channe3.speed_mode, servo_channe3.channel);
-                //     vTaskDelay(200 / portTICK_RATE_MS);
-                //     vTaskDelay(10 / portTICK_RATE_MS);
-                //     if (i == 1)
-                //     {
-
-                //             a1.servo_channel = &servo_channe1,
-                //             a1.timestep = 0.0009 * 5,
-                //             // .thetai = 0,
-                //             a1.thetaf = double(40 + (random0 % 17 % 5)),
-                //             // .omegai = 0,
-                //             a1.omegaf = 0,
-                //             a1.acci = double(35 - (random0 % 19 % 3)),
-                //             a1.accf = 30,
-                //             a1.tf = 0.3;
-
-                //             a3.servo_channel = &servo_channe3,
-                //             a3.timestep = 0.0009 * 5,
-                //             // .thetai = 0,
-                //             a3.thetaf = double(115 - (random0 % 61 % 5)),
-                //             // .omegai = 0,
-                //             a3.omegaf = 0,
-                //             a3.acci = double(35 - (random0 % 57 % 3)),
-                //             a3.accf = 30,
-                //             a3.tf = 0.3;
-                //             u_int32_t  duty = convert_servo_angle_to_duty(115);
-                //     ledc_set_duty(servo_channe1.speed_mode, servo_channe1.channel, duty);
-                //     ledc_update_duty(servo_channe1.speed_mode, servo_channe1.channel);
-                //       duty = convert_servo_angle_to_duty(90);
-                //     ledc_set_duty(servo_channe3.speed_mode, servo_channe3.channel, duty);
-                //     ledc_update_duty(servo_channe3.speed_mode, servo_channe3.channel);
-                //     vTaskDelay(200 / portTICK_RATE_MS);
-                //     }
-                //     else if(i==2)
-                //     {
-
-                //             a1.servo_channel = &servo_channe1,
-                //             a1.timestep = 0.0009 * 5,
-                //             // .thetai = 0,
-                //             a1.thetaf = double(40+30 + (random0 % 17 % 5)),
-                //             // .omegai = 2,
-                //             a1.omegaf = 0,
-                //             a1.acci = double(155 - (random0 % 19 % 3)),
-                //             a1.accf = 155,
-                //             a1.tf = 0.25;
-
-                //             a3.servo_channel = &servo_channe3,
-                //             a3.timestep = 0.0009 * 5,
-                //             // .thetai = 0,
-                //             a3.thetaf = double(115-30 - (random0 % 61 % 5)),
-                //             // .omegai = 0,
-                //             a3.omegaf = 0,
-                //             a3.acci = double(155 - (random0 % 57 % 3)),
-                //             a3.accf = 155,
-                //             a3.tf = 0.25;
-                //             Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-                //     }
-                //     printf("%d:2a1=%lf,a3=%lf\n",i,a1.thetai,a3.thetai);
-
-                //     if(i == 1)
-                //     {
-                //          vTaskDelay(600 / portTICK_RATE_MS);
-                //          ESP_LOGI("A","a");
-                //     }
-                //     vTaskDelay(10 / portTICK_RATE_MS);
-                // }
+            
+        }
+        else if (true ||random0 % 5 == 1)//true ||
+        {
+            random0 = esp_random();
+            if(random0 % 2 == 1){
+            printf("aaaa\n");
+            { // 弯耳朵
+                a0.timestep = 0.0009 * 5,
+                a0.tf = 0.05;
+                a1.timestep = 0.0009 * 5,
+                a1.tf = 0.05;
+                a2.timestep = 0.0009 * 5,
+                a2.tf = 0.05,
+                a3.servo_channel = &servo_channe3,
+                a3.timestep = 0.0009 * 5,
+                a3.thetai = 115,
+                a3.thetaf = double(41 - (random0 % 17 % 3)),
+                a3.omegaf = 0,
+                a3.acci = double(155 - (random0 % 19 % 3)),
+                a3.accf = 155,
+                a3.tf = 0.05;
+                Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+                vTaskDelay((45 + (random0 % 23 % 5) )/ portTICK_RATE_MS);
             }
+            
+            { // 收回耳朵快速
+                a0.timestep = 0.0009 * 5,
+                a0.tf = 0.05;
+                a1.timestep = 0.0009 * 5,
+                a1.tf = 0.05;
+                a2.timestep = 0.0009 * 5,
+                a2.tf = 0.05;
+                a3.servo_channel = &servo_channe3,
+                a3.timestep = 0.0009 * 5,
+                a3.thetaf = double(108 - (random0 % 37 % 3)),
+                a3.omegaf = 0,
+                a3.acci = double(155 - (random0 % 41 % 3)),
+                a3.accf = 155,
+                a3.tf = 0.05;
+                Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+                vTaskDelay((60 - (random0 % 43 % 17)) / portTICK_RATE_MS);
+            }
+            
+            { // 弯耳朵
+                a0.timestep = 0.0009 * 5,
+                a0.tf = 0.05;
+                a1.timestep = 0.0009 * 5,
+                a1.tf = 0.05;
+                a2.timestep = 0.0009 * 5,
+                a2.tf = 0.05,
+                a3.servo_channel = &servo_channe3,
+                a3.timestep = 0.0009 * 5,
+                a3.thetaf = double(41 - (random0 % 61 % 3)),
+                a3.omegaf = 0,
+                a3.acci = double(155 - (random0 % 67 % 3)),
+                a3.accf = 155,
+                a3.tf = 0.05;
+                Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+                vTaskDelay((70 - (random0 % 71 % 11) )/ portTICK_RATE_MS);
+            }
+            
+            { // 收回耳朵慢速
+                a0.timestep = 0.0009 * 5,
+                a0.tf = 0.08;
+                a1.timestep = 0.0009 * 5,
+                a1.tf = 0.08;
+                a2.timestep = 0.0009 * 5,
+                a2.tf = 0.08;
+                a3.servo_channel = &servo_channe3,
+                a3.timestep = 0.0009 * 5,
+                a3.thetaf = double(115 - (random0 % 83 % 3)),
+                a3.omegaf = 0,
+                a3.acci = double(155 - (random0 % 89 % 3)),
+                a3.accf = 155,
+                a3.tf = 0.08;
+                Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+                vTaskDelay(1500 / portTICK_RATE_MS);
+            }
+            }
+            else
+            {
+                printf("aaaa\n");
+            { // 弯耳朵
+                a0.timestep = 0.0009 * 5,
+                a0.tf = 0.05;
+                a1.servo_channel = &servo_channe1,
+                a1.timestep = 0.0009 * 5,
+                a1.thetaf = double(144 + (random0 % 11 % 3)),
+                a1.omegaf = 0,
+                a1.acci = double(155 - (random0 % 13 % 3)),
+                a1.accf = 155,
+                a1.tf = 0.05;
+                a2.timestep = 0.0009 * 5,
+                a2.tf = 0.05,
+                a3.timestep = 0.0009 * 5,
+                a3.tf = 0.05;
+                Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+                vTaskDelay((45 + (random0 % 23 % 5) )/ portTICK_RATE_MS);
+            }
+            
+            { // 收回耳朵快速
+                a0.timestep = 0.0009 * 5,
+                a0.tf = 0.05;
+                a1.servo_channel = &servo_channe1,
+                a1.timestep = 0.0009 * 5,
+                a1.thetaf = double(48 + (random0 % 29 % 5)),
+                a1.omegaf = 0,
+                a1.acci = double(155 - (random0 % 31 % 3)),
+                a1.accf = 155,
+                a1.tf = 0.05;
+                a2.timestep = 0.0009 * 5,
+                a2.tf = 0.05;
+                a3.timestep = 0.0009 * 5,
+                a3.tf = 0.05;
+                Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+                vTaskDelay((60 - (random0 % 43 % 17)) / portTICK_RATE_MS);
+            }
+            
+            { // 弯耳朵
+                a0.timestep = 0.0009 * 5,
+                a0.tf = 0.05;
+                a1.servo_channel = &servo_channe1,
+                a1.timestep = 0.0009 * 5,
+                a1.thetaf = double(144 + (random0 % 47 % 3)),
+                a1.omegaf = 0,
+                a1.acci = double(155 - (random0 % 53 % 3)),
+                a1.accf = 155,
+                a1.tf = 0.05;
+                a2.timestep = 0.0009 * 5,
+                a2.tf = 0.05,
+                a3.timestep = 0.0009 * 5,
+                a3.tf = 0.05;
+                Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+                vTaskDelay((70 - (random0 % 71 % 11) )/ portTICK_RATE_MS);
+            }
+            
+            { // 收回耳朵慢速
+                a0.timestep = 0.0009 * 5,
+                a0.tf = 0.08;
+                a1.servo_channel = &servo_channe1,
+                a1.timestep = 0.0009 * 5,
+                a1.thetaf = double(43 + (random0 % 73 % 5)),
+                a1.omegaf = 0,
+                a1.acci = double(155 - (random0 % 79 % 3)),
+                a1.accf = 155,
+                a1.tf = 0.08;
+                a2.timestep = 0.0009 * 5,
+                a2.tf = 0.08;
+                a3.timestep = 0.0009 * 5,
+                a3.tf = 0.08;
+                Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+                vTaskDelay(1500 / portTICK_RATE_MS);
+            }
+
+            }
+
+            
         }
         else
         {
-            { // 缓慢折耳
-                double M = 0.35 + double(random0 % 19) * 0.01;
-                settf(M);
-                a1.thetaf = double(40 + (random0 % 7 % 5)),
-                a1.omegai = 0,
-                a1.omegaf = 0,
-                a1.acci = 35,
-                a1.accf = 35,
-                a3.thetaf = double(140 + (random0 % 11 % 5)),
-                a3.omegai = 0,
-                a3.omegaf = 0,
-                a3.acci = 35,
-                a3.accf = 35,
-
-                printf("a1=%lf,a3=%lf\n", a1.thetaf, a3.thetaf);
-                Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
-                vTaskDelay(10 + (random0 % 127) * 10 / portTICK_RATE_MS);
-            }
+            printf("aaaa2\n");
+            
             { // 缓慢收回
                 double M = 0.35 + double(random0 % 19) * 0.01;
                 settf(M);
-                a1.thetai = 0,
+                
                 a1.thetaf = double(115 + (esp_random() % 5)),
                 a1.omegai = 0,
                 a1.omegaf = 0,
                 a1.acci = 35,
                 a1.accf = 35,
-                a3.thetai = 0,
+                
                 a3.thetaf = double(65 + (esp_random() % 5)),
                 a3.omegai = 0,
                 a3.omegaf = 0,
@@ -507,7 +532,25 @@ static void task_4(void *pvParameters)
                 Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
                 vTaskDelay(10 / portTICK_RATE_MS);
             }
-            vTaskDelay(1000 + random0 % 23 * 100 / portTICK_RATE_MS);
+            { // 缓慢折耳
+                double M = 0.35 + double(random0 % 19) * 0.01;
+                settf(M);
+                a1.thetaf = double(40 + (random0 % 7 % 5)),
+                a1.omegai = 0,
+                a1.omegaf = 0,
+                a1.acci = 35,
+                a1.accf = 35,
+                a3.thetaf = double(120 + (random0 % 11 % 5)),
+                a3.omegai = 0,
+                a3.omegaf = 0,
+                a3.acci = 35,
+                a3.accf = 35,
+
+                printf("a1=%lf,a3=%lf\n", a1.thetaf, a3.thetaf);
+                Servo_run(servo_channe0, servo_channe1, servo_channe2, servo_channe3, &a0, &a1, &a2, &a3);
+                vTaskDelay((10 + (random0 % 127) * 10) / portTICK_RATE_MS);
+            }
+            vTaskDelay((1000 + random0 % 23 * 100) / portTICK_RATE_MS);
         }
     }
     vTaskDelete(NULL);
@@ -632,7 +675,7 @@ static void mpu6050_task(void *pvParameters)
         {
             lasttime = esp_log_timestamp() / 100;
             // printf("Samples:%d ", lasttime);
-            printf("Pitch:%lfRoll:%lf \n", mpu6050_data.pitch,mpu6050_data.roll);
+            // printf("Pitch:%lfRoll:%lf \n", mpu6050_data.pitch,mpu6050_data.roll);
             count = 0;
             which_run();
             // printf(" Acc:(%4.2f,%4.2f,%4.2f)", mpu6050_data.ax, mpu6050_data.ay, mpu6050_data.az);
